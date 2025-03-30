@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 8776a65b07c4c914fa7552e4ca9d6dd8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - BirdPrefab: {fileID: -3334068668886253256, guid: 43f58919c648a7444ab088a3f0e82076, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
