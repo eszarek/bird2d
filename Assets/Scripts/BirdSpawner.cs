@@ -4,17 +4,15 @@ using UnityEngine;
 
 public class BirdSpawner : MonoBehaviour
 {
-    public GameObject[] prefabs; // Array of bird prefabs
-
-    [SerializeField]
-    private Bird.BirdType[] BirdTypes; // Array of different bird types
+    public GameObject[] prefabs; // Assign prefabs in the Inspector
+    [SerializeField] private Bird.BirdType[] BirdTypes; // Assign BirdTypes in the Inspector
 
     void Awake()
     {
         for (int i = 0; i < BirdTypes.Length; i++)
         {
-            int birdCount = Mathf.RoundToInt(BirdTypes[i].BirdCount); // Ensure it's an integer
-            for (int num = 0; num < birdCount; num++)
+            int birdCount = Mathf.RoundToInt(BirdTypes[i].BirdCount); // Ensure integer count
+            for (int j = 0; j < birdCount; j++)
             {
                 SpawnBird(BirdTypes[i]);
             }
@@ -29,7 +27,6 @@ public class BirdSpawner : MonoBehaviour
             return;
         }
 
-        // Pick a random prefab from the array
         GameObject birdObject = Instantiate(prefabs[Random.Range(0, prefabs.Length)], transform.position, Quaternion.identity);
 
         Bird bird = birdObject.GetComponent<Bird>();

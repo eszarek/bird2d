@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Diagnostics;
+using System;
 
 
 public class Hook : MonoBehaviour
@@ -108,11 +110,11 @@ public class Hook : MonoBehaviour
 
             target.transform.DOShakeRotation(5, Vector3.forward * 45, 10, 90, false).SetLoops(1, LoopType.Yoyo).OnComplete(delegate
             {
-                target.transform.rotation = Quaternion.identity;
+                target.transform. = Quaternion.identity;               
             });
             if (birdCount == strength)
                 StopFishing();
         }
-    }
+    }    
 }
 

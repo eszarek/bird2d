@@ -6,35 +6,24 @@ using System;
 
 public class Bird : MonoBehaviour
 {
-    private Bird.BirdType type;
-
+    private BirdType type;
     private CircleCollider2D coll;
-
-    private SpriteRenderer rend;
-
     private float screenLeft;
-
     private Tweener tweener;
 
-
-    public Bird.BirdType Type
+    public BirdType Type
     {
-        get
-        {
-            return type;
-        }
+        get { return type; }
         set
         {
             type = value;
             coll.radius = type.collierRadius;
-            rend.sprite = type.sprite;
         }
     }
 
     void Awake()
     {
         coll = GetComponent<CircleCollider2D>();
-        rend = GetComponentInChildren<SpriteRenderer>();
         screenLeft = Camera.main.ScreenToWorldPoint(Vector3.zero).x;
     }
 
@@ -43,51 +32,64 @@ public class Bird : MonoBehaviour
         if (tweener != null)
             tweener.Kill(false);
 
-        float num = UnityEngine.Random.Range(type.minLenght, type.maxLenght);
+        float spawnHeight = UnityEngine.Random.Range(type.minLenght, type.maxLenght);
         coll.enabled = true;
 
         Vector3 position = transform.position;
-        position.y = num;
+        position.y = spawnHeight;
         position.x = screenLeft;
         transform.position = position;
 
-        float num2 = 1;
-        float y = UnityEngine.Random.Range(num - num2, num + num2);
-        Vector2 v = new Vector2(-position.x, y);
+        float heightVariation = 1f;
+        float targetY = UnityEngine.Random.Range(spawnHeight - heightVariation, spawnHeight + heightVariation);
+        Vector2 targetPos = new Vector2(-position.x, targetY);
 
-        float num3 = 3;
-        float delay = UnityEngine.Random.Range(0, 2 * num3);
-        tweener = transform.DOMove(v, num3, false).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.Linear).SetDelay(delay).OnStepComplete(delegate
-        {
-            Vector3 localScale = transform.localScale;
-            localScale.x = -localScale.x;
-            transform.localScale = localScale;
-        });
+        float moveDuration = 3f;
+        float delay = UnityEngine.Random.Range(0, 2 * moveDuration);
+        tweener = transform.DOMove(targetPos, moveDuration, false)
+            .SetLoops(-1, LoopType.Yoyo)
+            .SetEase(Ease.Linear)
+            .SetDelay(delay)
+            .OnStepComplete(() =>
+            {
+                Vector3 localScale = transform.localScale;
+                localScale.x = -localScale.x;
+                transform.localScale = localScale;
+            });
     }
-
 
     public void Hooked()
     {
         coll.enabled = false;
-        tweener.Kill(false);
+        if (tweener != null) tweener.Kill(false);
+        UnityEngine.Debug.LogError("bird hooked!");
+        
+
+        Animator animator = GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.Play("takeoff"); // Play Takeoff animation
+
+            // Wait for Takeoff to finish before transitioning to Flap
+            StartCoroutine(TransitionToFlap(animator));
+        }
+    }
+    // Coroutine to transition from Takeoff to Flap
+    private IEnumerator TransitionToFlap(Animator animator)
+    {
+        AnimatorStateInfo takeoffState = animator.GetCurrentAnimatorStateInfo(0);
+        yield return new WaitForSeconds(takeoffState.length); // Wait for the Takeoff animation to finish
+
+        animator.Play("flap"); // Switch to Flap animation
     }
 
     [Serializable]
     public class BirdType
     {
         public int price;
-
         public float BirdCount;
-
         public float minLenght;
-
         public float maxLenght;
-
         public float collierRadius;
-
-        public Sprite sprite;
-
-       
     }
 }
-
