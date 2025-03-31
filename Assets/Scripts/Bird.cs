@@ -10,7 +10,7 @@ public class Bird : MonoBehaviour
     private CircleCollider2D coll;
     private float screenLeft;
     private Tweener tweener;
-
+    private SpriteRenderer birdRenderer;
     public BirdType Type
     {
         get { return type; }
@@ -25,6 +25,7 @@ public class Bird : MonoBehaviour
     {
         coll = GetComponent<CircleCollider2D>();
         screenLeft = Camera.main.ScreenToWorldPoint(Vector3.zero).x;
+        birdRenderer = GetComponent<SpriteRenderer>();
     }
 
     public void ResetBird()
@@ -62,17 +63,17 @@ public class Bird : MonoBehaviour
     {
         coll.enabled = false;
         if (tweener != null) tweener.Kill(false);
-        UnityEngine.Debug.LogError("bird hooked!");
         
-
+        
         Animator animator = GetComponent<Animator>();
         if (animator != null)
         {
             animator.Play("takeoff"); // Play Takeoff animation
-            UnityEngine.Debug.LogError("takeoff!");
+            FlashBird();
             // Wait for Takeoff to finish before transitioning to Flap
             StartCoroutine(TransitionToFlap(animator));
         }
+
     }
     // Coroutine to transition from Takeoff to Flap
     public IEnumerator TransitionToFlap(Animator animator)
@@ -82,8 +83,36 @@ public class Bird : MonoBehaviour
 
         // Transition to "Flap" after the "Takeoff" animation is done
         animator.Play("flap"); // Transition to Flap
-        UnityEngine.Debug.LogError("flap!");
+        StartFloating();
     }
+    public void StartFloating()
+    {
+        float floatDistance = 1f; // How far left/right to float
+        float floatDuration = UnityEngine.Random.Range(2f, 4f); // Randomize duration slightly
+
+        transform.DOLocalMoveX(transform.localPosition.x + floatDistance, floatDuration)
+            .SetLoops(-1, LoopType.Yoyo) // Repeat forever
+            .SetEase(Ease.InOutSine);
+    }
+
+
+    private void FlashBird()
+    {
+        if (birdRenderer == null)
+        {
+            Debug.LogError("birdRenderer is null! Make sure the Bird has a SpriteRenderer.");
+            return;
+        }
+
+        Debug.Log("Flashing bird!");
+
+        Color originalColor = birdRenderer.color;
+        birdRenderer.color = Color.red; // Bright white effect
+        DOVirtual.DelayedCall(0.5f, () => birdRenderer.color = originalColor); // Revert after  sec
+    }
+
+
+
 
     [Serializable]
     public class BirdType
