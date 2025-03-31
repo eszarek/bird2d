@@ -69,18 +69,20 @@ public class Bird : MonoBehaviour
         if (animator != null)
         {
             animator.Play("takeoff"); // Play Takeoff animation
-
+            UnityEngine.Debug.LogError("takeoff!");
             // Wait for Takeoff to finish before transitioning to Flap
             StartCoroutine(TransitionToFlap(animator));
         }
     }
     // Coroutine to transition from Takeoff to Flap
-    private IEnumerator TransitionToFlap(Animator animator)
+    public IEnumerator TransitionToFlap(Animator animator)
     {
-        AnimatorStateInfo takeoffState = animator.GetCurrentAnimatorStateInfo(0);
-        yield return new WaitForSeconds(takeoffState.length); // Wait for the Takeoff animation to finish
+        // Wait until "Takeoff" animation finishes playing
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
 
-        animator.Play("flap"); // Switch to Flap animation
+        // Transition to "Flap" after the "Takeoff" animation is done
+        animator.Play("flap"); // Transition to Flap
+        UnityEngine.Debug.LogError("flap!");
     }
 
     [Serializable]

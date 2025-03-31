@@ -108,10 +108,10 @@ public class Hook : MonoBehaviour
             target.transform.rotation = hookedTransfrom.rotation;
             //target.transform.localScale = Vector3.one;
 
-            target.transform.DOShakeRotation(5, Vector3.forward * 45, 10, 90, false).SetLoops(1, LoopType.Yoyo).OnComplete(delegate
-            {
-                target.transform. = Quaternion.identity;               
-            });
+            //target.transform.DOShakeRotation(5, Vector3.forward * 45, 10, 90, false).SetLoops(1, LoopType.Yoyo).OnComplete(delegate
+            //{
+            //    target.transform.rotation = Quaternion.identity;               
+            //});
             if (birdCount == strength)
                 StopFishing();
         }
