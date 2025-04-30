@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Diagnostics;
+using System;
 
 
 public class Hook : MonoBehaviour
@@ -20,12 +22,14 @@ public class Hook : MonoBehaviour
     private List<Bird> hookedFishes;
 
     private Tweener cameraTween;
+    private SpriteRenderer hookRenderer;
 
     void Awake () {
         mainCamera = Camera.main;
         coll = GetComponent<Collider2D>();
         hookedFishes = new List<Bird>();
-	}
+        hookRenderer = GetComponent<SpriteRenderer>();
+    }
 
     // Update is called once per frame
     void Update()
@@ -102,17 +106,36 @@ public class Hook : MonoBehaviour
             component.Hooked();
             hookedFishes.Add(component);
             target.transform.SetParent(transform);
-            target.transform.position = hookedTransfrom.position;
-            target.transform.rotation = hookedTransfrom.rotation;
-            //target.transform.localScale = Vector3.one;
-
-            target.transform.DOShakeRotation(5, Vector3.forward * 45, 10, 90, false).SetLoops(1, LoopType.Yoyo).OnComplete(delegate
+            // Move bird to a slightly spread-out position in the center
+            Vector3 spreadOffset = new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-0.5f, 0.5f), 0);
+            target.transform.DOMove(hookedTransfrom.position + spreadOffset, 1f).OnComplete(() =>
             {
-                target.transform.rotation = Quaternion.identity;
+                component.StartFloating(); // Start floating after reaching position
             });
+            FlashHook();
             if (birdCount == strength)
                 StopFishing();
         }
+    }    
+        public void StartFloating()
+    {
+        float floatDistance = 1f; // How far left/right to float
+        float floatDuration = UnityEngine.Random.Range(2f, 4f); // Randomize duration slightly
+
+        transform.DOLocalMoveX(transform.localPosition.x + floatDistance, floatDuration)
+            .SetLoops(-1, LoopType.Yoyo) // Repeat forever
+            .SetEase(Ease.InOutSine);
     }
+
+    private void FlashHook()
+    {
+        if (hookRenderer != null)
+        {
+            Color originalColor = hookRenderer.color;
+            hookRenderer.DOColor(Color.white * 1.5f, 0.1f) // Brighten effect
+                .OnComplete(() => hookRenderer.DOColor(originalColor, 0.1f));
+        }
+    }
+
 }
 
